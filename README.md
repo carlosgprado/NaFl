@@ -29,7 +29,7 @@ Most of the installation is straightforward:
     - NaFlCore: nothing to do here at installation time
     - PinTool: contains a single file "MyPinTool.cpp"
     - Compiling your own PinTool is kind of a pain so most of the people I know use this little trick:
-        -_cd_ to _Pin_directory_\source\tools\MyPinTool
+        - _cd_ to _Pin_directory_\source\tools\MyPinTool
         - Overwrite the _MyPinTool.cpp_ file with yours
         - Open the project in Visual Studio (I used VS Community 2013, very recommended to use this one)
         - Build the project
@@ -88,7 +88,7 @@ __SO MANY…__
 - Static analysis of the victim binary itself
     - Cannibalize strings
     - Check proximity to str(n)cmp and alike…
-        -Maybe implement in [JARVIS](https://github.com/carlosgprado/JARVIS)?
+        - Maybe implement in [JARVIS](https://github.com/carlosgprado/JARVIS)?
 
 - Analysis of the samples
     - Find high entropy regions (uninteresting)
@@ -102,5 +102,8 @@ __SO MANY…__
 
 ### Thanks ###
 
-This was done during my work time and therefore paid by my current employer, [Siemens AG](http://www.siemens.com) __Yes we do more than washing machines! ;)__
-It was nice of them to allow this public release.
+This was done during my work time and therefore paid by my current employer, [Siemens AG](http://www.siemens.com) 
+
+__Yes we do more than washing machines! ;)__
+
+Thanks for allowing this public release.
