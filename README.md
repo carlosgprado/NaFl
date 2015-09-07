@@ -8,9 +8,9 @@ FAQ
 - Why _NaFl_?
     - _NaFl_ means sarcastically: "It is totally Not AFL" </sarcasm>
     - NOTE: when I say AFL, I mean AFL v.0.1 alpha ;)
-
 - What is it?
     - It is a prototype of a _code coverage fuzzer_. I wanted to have something like [AFL](http://lcamtuf.coredump.cx/afl/) to use in Windows. Unfortunately everything looked very *NIX centric (AFAIK) so I decided to implement the _core principles_ from the ground up (and learned something on the way)
+    
     - It leverages dynamic binary instrumentation (DBI) to measure code coverage in blackbox Windows binaries.
         - "Fun" fact: adding support for Intel PIN to AFL was actually my original research project but _mothran_ beat me to it, see his (her?) fantastic work [here](https://github.com/mothran/aflpin)
         - _NaFl_ can be thought as this with some Python core implementing a simple fuzzing logic
