@@ -6,8 +6,9 @@ FAQ
 ---
 
 - Why _NaFl_?
-    - _NaFl_ means sarcastically: "It is totally Not AFL" </sarcasm>
+    - _NaFl_ means sarcastically: "It is totally Not AFL"
     - NOTE: when I say AFL, I mean AFL v.0.1 alpha ;)
+
 - What is it?
     - It is a prototype of a _code coverage fuzzer_. I wanted to have something like [AFL](http://lcamtuf.coredump.cx/afl/) to use in Windows. Unfortunately everything looked very *NIX centric (AFAIK) so I decided to implement the _core principles_ from the ground up (and learned something on the way)
     
@@ -50,14 +51,14 @@ Most of the installation is straightforward:
 
 These Python modules are part of the client's core:
 
-- Winappdbg (pip install winappdbg)
+- Winappdbg (`pip install winappdbg`)
     - This is awesome sauce, check more [here](http://winappdbg.sourceforge.net/)
-- SQLAlchemy (pip install sqlalchemy)
+- SQLAlchemy (`pip install sqlalchemy`)
 
 The following Python modules are needed for the server:
 
-- Tornado (pip install tornado)
-- Twisted (pip install twisted)
+- Tornado (`pip install tornado`)
+- Twisted (`pip install twisted`)
 
 
 ### Running ###
@@ -65,14 +66,21 @@ The following Python modules are needed for the server:
 Once currently installed, running is pretty straightforward.
 
 - Run the server for collecting information and crash files
-    - python server\xmlrpc-server.py
+    - `python server\xmlrpc-server.py`
 
 - Edit the config file
     - Location of PIN and the corresponding PinTool
     - Location of the ~~victim~~ binary to analyze
 
 - Run the core
-    - python NaFlCore.py
+    - `python NaFlCore.py`
+
+
+### Tested on ###
+
+At this moment NaFl has been tested in the following configurations:
+
+- Windows 7 x64
 
 
 ### Future Enhancements ###
@@ -85,19 +93,20 @@ __SO MANY…__
     - Decrypt / Encrypt...
     - etc.
 
+- Regularly evaluate the quality of mutations in the queue
+    - Remove ones not yielding anything interesting in a long time?
+    - Trim mutations?
+
 - Static analysis of the victim binary itself
     - Cannibalize strings
     - Check proximity to str(n)cmp and alike…
         - Maybe implement in [JARVIS](https://github.com/carlosgprado/JARVIS)?
 
-- Analysis of the samples
+- Pre-analysis of the samples
     - Find high entropy regions (uninteresting)
     - Find ASCII regions
     - Compare samples to find fixed tokens (PNG, etc.)
 
-- Regularly evaluate the quality of mutations in the queue
-    - Remove ones not yielding anything interesting in a long time?
-    - Trim mutations?
 
 
 ### Thanks ###
