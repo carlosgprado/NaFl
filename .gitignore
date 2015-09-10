@@ -1,5 +1,5 @@
 *.pyc
-NaFlCore/logs/*
+NaFlCore/logs/*.txt
 NaFlCore/saved_bitmap.p
 NaFlCore/.idea/*
 .idea/*
