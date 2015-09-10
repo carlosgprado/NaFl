@@ -59,7 +59,7 @@ class myFileGenerator():
 
         input_filename = os.path.join(self.mutations_dir, input_file)
 
-        with open(input_filename, 'r') as f:
+        with open(input_filename, 'rb') as f:
             original_contents = f.read()
 
         # Invoke Cthulhu! Yield a mutation!
