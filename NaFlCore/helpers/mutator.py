@@ -223,6 +223,11 @@ class Cthulhu(object):
         Just swapping stuff
         """
         L = len(buf)
+
+        if L < 2:
+            # Impossible to swap
+            return buf
+
         off1 = random.randrange(L/2)
         len1 = random.randint(1, (L/2) - off1)
 
@@ -237,9 +242,9 @@ class Cthulhu(object):
 
         if self.debug:
             print "=== [debug] Swap blocks"
-            print A + D  + C + B + E
+            print A + D + C + B + E
 
-        return A + D  + C + B + E
+        return A + D + C + B + E
 
     def get_token_mutation(self, t):
         """
