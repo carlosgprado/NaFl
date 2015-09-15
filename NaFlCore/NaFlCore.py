@@ -37,7 +37,7 @@ cfg = SafeConfigParser()
 cfg.read('config.ini')
 
 cmd_l = []
-ml = None   # main logger
+ml = None  # main logger
 
 
 def initialize_logging():
@@ -54,7 +54,7 @@ def initialize_logging():
         LOG_FILENAME,
         maxBytes = 1024 * 1024,
         backupCount = 1
-        )
+    )
 
     main_logger.addHandler(handler)
 
@@ -92,7 +92,7 @@ def is_interesting_input(curr_bitmap):
     global history_bitmap
 
     if curr_bitmap[0] == 0x41414141 \
-    and curr_bitmap[1] == 0x42424242:
+            and curr_bitmap[1] == 0x42424242:
         # Crash!
         # TODO: move this to a parallel communication channel :)
         # Restore these first bytes to more appropriate values
@@ -144,7 +144,7 @@ def fuzzing_loop():
     This loops (maybe indefinitely) creating several
     fuzzing processes
     """
-    id = 0
+    m_id = 0
 
     # Instantiate without params to deactivate debugging
     filegen = myFileGenerator(debug = DEBUG)
@@ -153,10 +153,10 @@ def fuzzing_loop():
     ml.info("[*] Initializing queue...")
 
     for s in fileops.get_all_filenames(filegen.mutations_dir):
-        mutationQueue.put(FileToMutate(0, s, id, None))
-        id += 1
+        mutationQueue.put(FileToMutate(0, s, m_id, None))
+        m_id += 1
 
-    ml.info("[*] Queue initialized with %d files" % id)
+    ml.info("[*] Queue initialized with %d files" % m_id)
     ml.info("[*] Starting fuzzing process...")
 
     while True:
@@ -166,11 +166,11 @@ def fuzzing_loop():
         # * instrumented process crashes
         # * timeout expires (implemented in PinTool)
 
-        id += 1
+        m_id += 1
 
         # This generates the mutations and
         # it writes the current test file
-        mutation_filename = filegen.write_test_case(id)
+        mutation_filename = filegen.write_test_case()
 
         if mutation_filename:
             mutation_bitmap = run_under_pin(mutation_filename)
@@ -186,12 +186,12 @@ def fuzzing_loop():
             filegen.delete_current_test_case()
 
         elif interesting == 1:
-            # ml.info("*** id: %d: Interesting file. Caused a whole new path. ***" % id)
-            mutationQueue.put(FileToMutate(1, mutation_filename, id, mutation_bitmap))
+            # ml.info("*** id: %d: Interesting file. Caused a whole new path. ***" % m_id)
+            mutationQueue.put(FileToMutate(1, mutation_filename, m_id, mutation_bitmap))
 
         elif interesting == 2:
-            # ml.info("*** id: %d: The hit count moved to another bin. ***" % id)
-            mutationQueue.put(FileToMutate(2, mutation_filename, id, mutation_bitmap))
+            # ml.info("*** id: %d: The hit count moved to another bin. ***" % m_id)
+            mutationQueue.put(FileToMutate(2, mutation_filename, m_id, mutation_bitmap))
 
         elif interesting == 3:
             ml.info('**** CRASH ****' * 4)
@@ -225,13 +225,13 @@ def main():
 
     if not history_bitmap:
         ml.info("[x] Failed to restore saved bitmap! Starting from scratch.")
-        history_bitmap = array('L', [0 for x in xrange(bitmap_size)])
+        history_bitmap = array('L', [0] * bitmap_size)
 
     shm = mmap.mmap(0,
-            shm_size,
-            shm_name,
-            access = mmap.ACCESS_WRITE
-        )
+                    shm_size,
+                    shm_name,
+                    access = mmap.ACCESS_WRITE
+                    )
 
     if not shm:
         # Oops!
@@ -261,7 +261,6 @@ def main():
             pickle.dump(history_bitmap, fp)
 
         sys.exit(1)
-
 
 
 if __name__ == '__main__':
