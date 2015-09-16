@@ -139,21 +139,30 @@ class Cthulhu(object):
         """
         Applies the selected plugins in order to
         extract the raw data to be mutated
-        :param file_contents:
+        :param file_contents: eeeh... the input file contents :)
         :return: extracted data
         """
-        # TODO: this is dummy for now
-        return file_contents
+        data = file_contents
+
+        for p in self.plugin_list:
+            data = p.pre(data)
+
+        return data
 
     def apply_post_processing(self, mutated_buffer):
         """
-        Applies the selected plugins in order to
-        extract the raw data to be mutated
-        :param mutated_buffer:
+        Applies the selected plugins in *reverse* order
+        to recreate the original file format
+        :param mutated_buffer: eeeh... the mutated buffer :)
         :return: new file contents
         """
-        # TODO: this is dummy for now
-        return mutated_buffer
+        data = mutated_buffer
+
+        for p in self.plugin_list[::-1]:
+            # The plugins are applied in reverse order
+            data = p.post(data)
+
+        return data
 
     def yield_mutation(self, file_contents = None):
         """
