@@ -78,7 +78,7 @@ class myFileGenerator():
         mutation_filename = os.path.join(self.mutations_dir, self.mutated_file_name)
 
         try:
-            with open(mutation_filename, 'w') as fh:
+            with open(mutation_filename, 'wb') as fh:
                 fh.write(mutated_contents)
 
             return mutation_filename
@@ -109,6 +109,7 @@ class Cthulhu(object):
         self.mode = mode
         self.debug = debug
         self.plugin_list = []
+        self.data_to_post = None
         print ""
         print "=== Initializing Cthulhu... ==="
         print "=== THE BRINGER OF DEATH... ==="
@@ -145,7 +146,8 @@ class Cthulhu(object):
         data = file_contents
 
         for p in self.plugin_list:
-            data = p.pre(data)
+            plugin = load_plugin(p)
+            data, self.data_to_post = plugin.pre(data)
 
         return data
 
@@ -160,7 +162,8 @@ class Cthulhu(object):
 
         for p in self.plugin_list[::-1]:
             # The plugins are applied in reverse order
-            data = p.post(data)
+            plugin = load_plugin(p)
+            data = plugin.post(data, self.data_to_post)
 
         return data
 

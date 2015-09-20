@@ -15,12 +15,12 @@ def get_plugins():
     plugins = []
     possible_plugins = os.listdir(PluginFolder)
 
-    for i in possible_plugins:
-        location = os.path.join(PluginFolder, i)
+    for p in possible_plugins:
+        location = os.path.join(PluginFolder, p)
         if not os.path.isdir(location) or not MainModule + '.py' in os.listdir(location):
             continue
         info = imp.find_module(MainModule, [location])
-        plugins.append({'name': i, 'info': info})
+        plugins.append({'name': p, 'info': info})
 
     return plugins
 
