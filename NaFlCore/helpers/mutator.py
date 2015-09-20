@@ -10,6 +10,7 @@ import itertools  # cycle :)
 import fileops
 from helpers.queue import mutationQueue, processedQueue
 from helpers.utils import random_alphabetical_string
+from helpers.plugin_loader import get_plugins, load_plugin
 
 
 class myFileGenerator():
@@ -46,7 +47,7 @@ class myFileGenerator():
 
         return e.filename
 
-    def _gen_mutation(self, id):
+    def _gen_mutation(self):
         """
         Generates mutated contents from a sample file
         """
@@ -68,16 +69,16 @@ class myFileGenerator():
 
         return m
 
-    def write_test_case(self, id):
+    def write_test_case(self):
         """
         It creates the test case contents
         :return: Tuple (original, mutated) filenames or None
         """
-        mutated_contents = self._gen_mutation(id)
+        mutated_contents = self._gen_mutation()
         mutation_filename = os.path.join(self.mutations_dir, self.mutated_file_name)
 
         try:
-            with open(mutation_filename, 'w') as fh:
+            with open(mutation_filename, 'wb') as fh:
                 fh.write(mutated_contents)
 
             return mutation_filename
@@ -107,10 +108,15 @@ class Cthulhu(object):
     def __init__(self, debug = False, mode = 'sequential'):
         self.mode = mode
         self.debug = debug
+        self.plugin_list = []
+        self.data_to_post = None
         print ""
         print "=== Initializing Cthulhu... ==="
         print "=== THE BRINGER OF DEATH... ==="
         print ""
+        print "=== Initializing plugins... ==="
+        self.initialize_plugins()
+
         self.cy_strings = itertools.cycle(self.get_common_strings())
         self.buffer_mutations = [
             #self.substitute_string,
@@ -120,20 +126,73 @@ class Cthulhu(object):
             self.lift_bytes
             ]
 
-    def yield_mutation(self, buf = None):
+    def initialize_plugins(self):
+        """
+        Load the selected plugins and makes
+        them available to Cthulhu
+        :return:
+        """
+        for p in get_plugins():
+            print "=== Loading plugin %s..." % p['name']
+            self.plugin_list.append(p)
+
+    def apply_pre_processing(self, file_contents):
+        """
+        Applies the selected plugins in order to
+        extract the raw data to be mutated
+        :param file_contents: eeeh... the input file contents :)
+        :return: extracted data
+        """
+        data = file_contents
+
+        for p in self.plugin_list:
+            plugin = load_plugin(p)
+            data, self.data_to_post = plugin.pre(data)
+
+        return data
+
+    def apply_post_processing(self, mutated_buffer):
+        """
+        Applies the selected plugins in *reverse* order
+        to recreate the original file format
+        :param mutated_buffer: eeeh... the mutated buffer :)
+        :return: new file contents
+        """
+        data = mutated_buffer
+
+        for p in self.plugin_list[::-1]:
+            # The plugins are applied in reverse order
+            plugin = load_plugin(p)
+            data = plugin.post(data, self.data_to_post)
+
+        return data
+
+    def yield_mutation(self, file_contents = None):
         """
         This is the meat and potatoes!!!1!
         Generators are cool
         Itertools are better!
         """
-        if buf:
-            # Mutations dependent of input are called randomly
+        if file_contents:
+            # Mutations processing our file input are called randomly
             # This is something analogous to an
             # array of function pointers in C/C++
             f_idx = random.randrange(len(self.buffer_mutations))
             fp = self.buffer_mutations[f_idx]
 
-            return fp.__call__(buf)
+            #
+            # Pre-processing of buffer (plugin)
+            #
+            buf = self.apply_pre_processing(file_contents)
+
+            mutated_buffer = fp.__call__(buf)
+
+            #
+            # Post-processing of mutated buffer (plugin)
+            #
+            new_file_contents = self.apply_post_processing(mutated_buffer)
+
+            return new_file_contents
 
         else:
             # Crappy fallback
@@ -177,6 +236,7 @@ class Cthulhu(object):
         if self.debug:
             print "=== [debug] Substitute string"
             print mod_buf
+
         return mod_buf
 
     def mutate_token(self, buf):
