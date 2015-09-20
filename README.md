@@ -87,11 +87,6 @@ At this moment NaFl has been tested in the following configurations:
 
 __SO MANY…__
 
-- Plugin system
-    - Pre- & Post- processing of the mutation
-    - Unzip / Zip for formats like DOCX and alike
-    - Decrypt / Encrypt...
-    - etc.
 
 - Regularly evaluate the quality of mutations in the queue
     - Remove ones not yielding anything interesting in a long time?
