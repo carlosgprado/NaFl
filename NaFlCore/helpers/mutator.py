@@ -185,7 +185,12 @@ class Cthulhu(object):
             #
             buf = self.apply_pre_processing(file_contents)
 
-            mutated_buffer = fp.__call__(buf)
+            if buf:
+                mutated_buffer = fp.__call__(buf)
+
+            else:
+                # empty buffer
+                mutated_buffer = buf
 
             #
             # Post-processing of mutated buffer (plugin)
