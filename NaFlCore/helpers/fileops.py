@@ -106,13 +106,14 @@ def restore_saved_bitmap():
     """
     filename_p = 'saved_bitmap.p'
 
-    print "=== [*] Restoring saved bitmap from %s..." % filename_p
-
     if os.path.isfile(filename_p):
+        print "=== [*] Restoring saved bitmap from %s..." % filename_p
+
         with open(filename_p, 'rb') as fp:
             return pickle.load(fp)
 
     else:
+        print "=== [*] Creating new bitmap..."
         return None
 
 
