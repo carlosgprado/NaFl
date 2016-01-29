@@ -7,7 +7,6 @@ import sys
 import mmap
 import subprocess
 from array import array
-from ConfigParser import SafeConfigParser
 import logging
 import logging.handlers
 
@@ -19,6 +18,7 @@ except:
 
 from helpers import utils
 from helpers import fileops
+from helpers.config import nConfig
 from helpers.mutator import myFileGenerator
 from helpers.queue import mutationQueue, FileToMutate
 from helpers.crash_analysis import analyze_crash
@@ -32,10 +32,7 @@ shm = None
 shm_size = 0
 history_bitmap = None
 
-# Configuration file stuff
-cfg = SafeConfigParser()
-cfg.read('config.ini')
-
+myConfig = nConfig()
 cmd_l = []
 ml = None  # main logger
 
@@ -70,15 +67,21 @@ def parse_config_file():
     global DEBUG
 
     # TODO: later this will be a GUI
-    cmd_l.append(cfg.get('pin_info', 'pin_bat'))
+    cmd_l.append(myConfig.cfg.get('pin_info', 'pin_bat'))
     cmd_l.append('-t')
-    cmd_l.append(cfg.get('pin_info', 'pintool'))
+    cmd_l.append(myConfig.cfg.get('pin_info', 'pintool'))
     cmd_l.append('-timer')
-    cmd_l.append(cfg.get('pin_info', 'timeout'))
+    cmd_l.append(myConfig.cfg.get('pin_info', 'timeout'))
+    cmd_l.append('-module')
+    cmd_l.append(myConfig.cfg.get('target_info', 'module'))
+    cmd_l.append('-debug')
+    cmd_l.append('1')
     cmd_l.append('--')
-    cmd_l.append(cfg.get('target_info', 'filename'))
+    cmd_l.append(myConfig.cfg.get('target_info', 'filename'))
 
-    DEBUG = cfg.getboolean('runtime', 'debug')
+    print cmd_l
+
+    DEBUG = myConfig.cfg.getboolean('runtime', 'debug')
 
 
 def is_interesting_input(curr_bitmap):
@@ -197,7 +200,7 @@ def fuzzing_loop():
             ml.info('**** CRASH ****' * 4)
             ml.info(mutation_filename)
 
-            cmd = [cfg.get('target_info', 'filename'), mutation_filename]
+            cmd = [myConfig.cfg.get('target_info', 'filename'), mutation_filename]
             # Analyzes the crash (and saves it, if determined interesting)
             analyze_crash(cmd)
 
@@ -242,7 +245,7 @@ def main():
     # Some logging :)
     ml.info("")
     ml.info("=" * 80)
-    ml.info("Started fuzzing: %s" % cfg.get('target_info', 'filename'))
+    ml.info("Started fuzzing: %s" % myConfig.cfg.get('target_info', 'filename'))
     ml.info("=" * 80)
 
     try:
