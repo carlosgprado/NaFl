@@ -10,12 +10,12 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include "pin.H"
-//#pragma comment(lib, "user32.lib")
 
 namespace WIN
 {
-	#include <windows.h>
+#include <windows.h>
 }
 
 #define BITMAP_SIZE 65536
@@ -31,6 +31,7 @@ ADDRINT lowAddress = 0;
 ADDRINT highAddress = 0;
 ADDRINT last_id = 0;
 ADDRINT current_id = 0;
+BOOL g_instrumenting = FALSE;
 PIN_LOCK lock;
 
 // IPC related
@@ -41,6 +42,15 @@ TCHAR szName[] = TEXT("Local\\NaFlSharedMemory");
 // Command Line stuff
 KNOB<BOOL> KnobLogDebug(KNOB_MODE_WRITEONCE, "pintool", "debug", "0", "shows some runtime information");
 KNOB<UINT32> KnobTimer(KNOB_MODE_WRITEONCE, "pintool", "timer", "5000", "timer in milliseconds");
+KNOB<string> KnobModuleName(KNOB_MODE_WRITEONCE, "pintool", "module", "None", "module to instrument");
+
+
+string s2l(string s)
+{
+	std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+
+	return s;
+}
 
 
 int setupIPC()
@@ -108,10 +118,12 @@ BOOL withinInterestingExecutable(ADDRINT ip)
 // Analysis function (execution time)
 void imageLoad_cb(IMG img, void *v)
 {
-	if (IMG_IsMainExecutable(img))
+	string imagename = s2l(IMG_Name(img));
+	string knobmodulename = KnobModuleName.Value();
+
+	if (std::strstr(imagename.c_str(), knobmodulename.c_str()) != NULL)
 	{
-		if (KnobLogDebug.Value())
-			TraceFile << "[-] Analysing main image: " << IMG_Name(img).c_str() << endl;
+		TraceFile << "[-] Instrumenting module: " << IMG_Name(img).c_str() << endl;
 
 		// Interested in the code section only
 		for (SEC sec = IMG_SecHead(img); SEC_Valid(sec); sec = SEC_Next(sec))
@@ -125,6 +137,9 @@ void imageLoad_cb(IMG img, void *v)
 				// Maybe tighten this condition
 				lowAddress = IMG_LowAddress(img);
 				highAddress = IMG_HighAddress(img);
+
+				// Let's start the action
+				g_instrumenting = TRUE;
 			}
 		}
 	} // end of is main exec
@@ -164,6 +179,9 @@ void LogConditionalJmp(ADDRINT ip)
 //
 void Trace(TRACE trace, void *v)
 {
+	if (!g_instrumenting)
+		return;
+
 	// Iterate through basic blocks
 	for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl))
 	{

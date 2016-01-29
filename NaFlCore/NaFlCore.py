@@ -74,12 +74,8 @@ def parse_config_file():
     cmd_l.append(myConfig.cfg.get('pin_info', 'timeout'))
     cmd_l.append('-module')
     cmd_l.append(myConfig.cfg.get('target_info', 'module'))
-    cmd_l.append('-debug')
-    cmd_l.append('1')
     cmd_l.append('--')
     cmd_l.append(myConfig.cfg.get('target_info', 'filename'))
-
-    print cmd_l
 
     DEBUG = myConfig.cfg.getboolean('runtime', 'debug')
 

@@ -5,7 +5,6 @@
 # I'll be happy to hear :)
 #
 
-import os
 from ConfigParser import SafeConfigParser
 
 
