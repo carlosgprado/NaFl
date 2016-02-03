@@ -73,7 +73,7 @@ def parse_config_file():
     cmd_l.append('-timer')
     cmd_l.append(myConfig.cfg.get('pin_info', 'timeout'))
     cmd_l.append('-module')
-    cmd_l.append(myConfig.cfg.get('target_info', 'module'))
+    cmd_l.append(myConfig.cfg.get('target_info', 'module').lower())
     cmd_l.append('--')
     cmd_l.append(myConfig.cfg.get('target_info', 'filename'))
 
