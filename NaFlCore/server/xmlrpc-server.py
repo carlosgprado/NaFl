@@ -39,6 +39,8 @@ class Hive(xmlrpc.XMLRPC):
         # crashes[node_id] = [crash_info1, crash_info2, ...]
         self.crashes = defaultdict()
 
+        if not os.path.isdir('crashes'):
+            os.mkdir('crashes')
 
     def xmlrpc_del_node(self, node_id):
         try:
